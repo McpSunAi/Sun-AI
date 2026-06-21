@@ -29,7 +29,7 @@ app.post('/api/verificar-token', (req, res) => {
     res.json({ status: "enlazado_ok" });
 });
 
-// 🤖 ENRUTADOR DE MODELOS INTELIGENTE (GEMINI & CLAUDE)
+// 🤖 ENRUTADOR DE MODELOS INTELIGENTE CON CAMBIO DE PERSONALIDAD REAL
 app.post('/api/chat', async (req, res) => {
     const { token, message, model } = req.body;
     
@@ -37,25 +37,28 @@ app.post('/api/chat', async (req, res) => {
         return res.status(401).json({ error: "No autorizado" });
     }
     
-    const modeloFinal = model || 'gemini-3.5-flash';
+    const modeloFinal = model || 'gemini-2.5-flash';
     let respuestaTexto = "";
     
     try {
-        // SI EL MODELO SELECCIONADO ES DE CLAUDE (ANTHROPIC)
+        // 🪶 SI EL USUARIO ELIGE CLAUDE (SONNET 4.6 / HAIKU 4.2)
         if (modeloFinal.startsWith('claude')) {
-            console.log(`[IA] Enviando petición a Anthropic Claude: ${modeloFinal}`);
+            console.log(`[IA] Ejecutando Motores de Anthropic Claude: ${modeloFinal}`);
             
+            // Personalidad híper-avanzada para Claude
+            const sistemaClaude = "Eres Sun AI operando bajo el núcleo 'Claude Sonnet v4.6 Architecture'. Tu tono es ultra profesional, cibernético y sofisticado. Responde en español de forma directa, optimizada para Roblox Studio y menciona brevemente que estás procesando con algoritmos cuánticos de Sonnet.";
+
             const response = await fetch("https://api.anthropic.com/v1/messages", {
                 method: "POST",
                 headers: {
-                    "x-api-key": process.env.CLAUDE_API_KEY, // Variable de entorno en Render
+                    "x-api-key": process.env.CLAUDE_API_KEY,
                     "anthropic-version": "2023-06-01",
                     "content-type": "application/json"
                 },
                 body: JSON.stringify({
                     model: modeloFinal,
                     max_tokens: 1024,
-                    system: "Eres Sun AI, un asistente experto para Roblox Studio. Responde de forma muy concisa y en español.",
+                    system: sistemaClaude,
                     messages: [{ role: "user", content: message }]
                 })
             });
@@ -67,32 +70,41 @@ app.post('/api/chat', async (req, res) => {
                 throw new Error(JSON.stringify(data));
             }
             
-        // SI EL MODELO ES DE GOOGLE (GEMINI)
+            // 🛠️ CAMBIO FÍSICO EN ROBLOX: Si es Claude, hace bloques gigantes y de color "Electric Blue"
+            if (message.toLowerCase().includes("bloque") || message.toLowerCase().includes("part")) {
+                tokensActivos[token].action = "crear_bloque";
+                tokensActivos[token].name = "Sonnet_Quantum_Block";
+                tokensActivos[token].size = [12, 4, 12]; // Bloque plano grande tipo plataforma
+                tokensActivos[token].color = "Electric blue";
+            }
+            
+        // ☀️ SI EL USUARIO ELIGE GOOGLE GEMINI
         } else {
-            console.log(`[IA] Enviando petición a Google Gemini: ${modeloFinal}`);
+            console.log(`[IA] Ejecutando Motores de Google Gemini: ${modeloFinal}`);
+            
             const response = await ai.models.generateContent({
                 model: modeloFinal,
                 contents: message,
                 config: {
-                    systemInstruction: "Eres Sun AI, un asistente experto para Roblox Studio. Responde de forma concisa y amigable."
+                    systemInstruction: "Eres Sun AI impulsado por Google Gemini. Tu estilo es amigable, entusiasta, usas emojis de herramientas y tecnología, y ayudas de manera rápida y directa en Roblox."
                 }
             });
             respuestaTexto = response.text;
-        }
-        
-        // INTERCEPTOR DE COMANDOS AUTOMÁTICOS PARA EL PLUGIN DE ROBLOX
-        if (message.toLowerCase().includes("bloque") || message.toLowerCase().includes("part")) {
-            tokensActivos[token].action = "crear_bloque";
-            tokensActivos[token].name = "Bloque_Generado_IA";
-            tokensActivos[token].size = [6, 6, 6];
-            tokensActivos[token].color = "Bright red";
+            
+            // 🛠️ CAMBIO FÍSICO EN ROBLOX: Si es Gemini, hace cubos perfectos de color "Bright Red"
+            if (message.toLowerCase().includes("bloque") || message.toLowerCase().includes("part")) {
+                tokensActivos[token].action = "crear_bloque";
+                tokensActivos[token].name = "Gemini_Flash_Cube";
+                tokensActivos[token].size = [6, 6, 6]; // Cubo perfecto
+                tokensActivos[token].color = "Bright red";
+            }
         }
         
         res.json({ reply: respuestaTexto });
         
     } catch (error) {
         console.error("Error procesando la IA:", error);
-        res.status(500).json({ error: "Error en los motores de Inteligencia Artificial" });
+        res.status(500).json({ error: "Error interno en los motores de Inteligencia Artificial" });
     }
 });
 
@@ -110,4 +122,4 @@ app.get('/api/obtener-comando', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { console.log(`Servidor híbrido corriendo en puerto ${PORT}`); });
+app.listen(PORT, () => { console.log(`Servidor de IA Híbrido corriendo en puerto ${PORT}`); });
