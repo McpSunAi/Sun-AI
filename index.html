@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sun AI - Gemini Workspace</title>
-    <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Iconos Premium Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
@@ -20,48 +18,40 @@
 </head>
 <body class="text-[#c9d1d9] h-screen flex overflow-hidden">
 
-    <!-- AUDIO PARA SONIDOS DE CLIC -->
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
-    <!-- ========================================== -->
-    <!-- 1. PANTALLA DE INICIO (BLOQUEADA POR LLAVE) -->
-    <!-- ========================================== -->
     <div id="setup-screen" class="fixed inset-0 bg-[#0d1117] flex flex-col items-center justify-center z-50 p-6 smooth">
         <div class="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="text-5xl animate-bounce">☀️</div>
             <div>
-                <h2 class="text-2xl font-bold text-white tracking-tight">Vincular Sun AI</h2>
-                <p class="text-sm text-[#8b949e] mt-2">Introduce tu token activo. Recuerda que primero debes darle a "Conectar" en el plugin de Roblox Studio.</p>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Vincular Sun AI Global</h2>
+                <p class="text-sm text-[#8b949e] mt-2">Genera un token de acceso y pégalo dentro de tu plugin en Roblox Studio para desbloquear el Chatbot.</p>
             </div>
 
-            <!-- Input Form -->
-            <div class="space-y-4 text-left">
-                <label class="text-xs font-semibold text-[#8b949e] uppercase tracking-wider block">Tu Token de Conexión</label>
-                <div class="flex items-center bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3 focus-within:border-amber-400 smooth">
-                    <i data-lucide="key" class="w-4 h-4 text-[#8b949e] mr-3"></i>
-                    <input id="token-input-field" type="password" placeholder="SUNAI-XXXXXX" class="w-full bg-transparent text-sm focus:outline-none text-white font-mono">
+            <div class="space-y-4">
+                <button id="generate-token-btn" class="click-pop smooth w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-[#0d1117] font-bold rounded-xl text-sm cursor-pointer shadow-lg shadow-amber-400/10 flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>Generar Token Único</span>
+                </button>
+
+                <div id="token-display-box" class="hidden space-y-3 pt-2">
+                    <div class="flex items-center justify-between bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3">
+                        <span id="generated-token" class="font-mono text-amber-400 font-bold text-base tracking-wider">SUNAI-XXXXXX</span>
+                        <button id="copy-token-btn" class="text-[#8b949e] hover:text-white p-1 smooth cursor-pointer" title="Copiar Token">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-center gap-2 text-xs text-slate-400 py-2">
+                        <div class="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Esperando enlace desde el plugin de Roblox...</span>
+                    </div>
                 </div>
-                <!-- Alerta de Error Oculta -->
-                <p id="error-message" class="text-xs text-red-400 font-medium hidden flex items-center gap-1">
-                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
-                    <span>Token inválido o Studio desconectado.</span>
-                </p>
             </div>
-
-            <!-- Botón de Conexión -->
-            <button id="connect-submit-btn" class="click-pop smooth w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] font-bold rounded-xl text-sm cursor-pointer shadow-lg shadow-amber-400/10 flex items-center justify-center gap-2">
-                <span id="btn-connect-text">Verificar y Conectar</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
         </div>
     </div>
 
 
-    <!-- ========================================== -->
-    <!-- 2. INTERFAZ PRINCIPAL (ESTILO GEMINI) -->
-    <!-- ========================================== -->
-    
-    <!-- BARRA LATERAL (SIDEBAR) -->
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
@@ -78,16 +68,13 @@
         <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1"></div>
     </aside>
 
-    <!-- ÁREA DE TRABAJO PRINCIPAL -->
     <div class="flex-1 flex flex-col h-full overflow-hidden hidden" id="main-content-area">
         
-        <!-- TOPBAR CON PERFIL -->
         <header class="h-16 border-b border-[#30363d] bg-[#0d1117] flex items-center justify-between px-8">
             <div class="flex items-center gap-2">
                 <span class="text-[#8b949e] text-xs font-medium uppercase tracking-widest bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]">Workspace Activo</span>
             </div>
 
-            <!-- Panel de Perfil de Roblox Sincronizado -->
             <div class="flex items-center gap-3 bg-[#161b22] border border-[#30363d] px-4 py-1.5 rounded-full">
                 <div class="text-right">
                     <p id="roblox-username" class="text-xs font-bold text-white">Cargando...</p>
@@ -100,7 +87,6 @@
             </div>
         </header>
 
-        <!-- CONTENEDOR DE CONVERSACIÓN -->
         <main class="flex-1 flex flex-col justify-between p-8 max-w-4xl w-full mx-auto relative overflow-hidden">
             <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2">
                 <div id="welcome-message-container" class="h-full flex flex-col justify-center py-12 space-y-2">
@@ -109,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- Caja de Entrada Estilo Gemini -->
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-5 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white placeholder-[#8b949e]">
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
@@ -119,9 +104,6 @@
         </main>
     </div>
 
-    <!-- ========================================== -->
-    <!-- LOGICA DE CONTROL DE FLUJO -->
-    <!-- ========================================== -->
     <script>
         lucide.createIcons();
 
@@ -129,11 +111,12 @@
         const setupScreen = document.getElementById('setup-screen');
         const mainSidebar = document.getElementById('main-sidebar');
         const mainContentArea = document.getElementById('main-content-area');
-        const tokenField = document.getElementById('token-input-field');
-        const connectBtn = document.getElementById('connect-submit-btn');
-        const btnConnectText = document.getElementById('btn-connect-text');
-        const errorMessage = document.getElementById('error-message');
         
+        const generateBtn = document.getElementById('generate-token-btn');
+        const tokenDisplayBox = document.getElementById('token-display-box');
+        const tokenLabel = document.getElementById('generated-token');
+        const copyBtn = document.getElementById('copy-token-btn');
+
         const chatsContainer = document.getElementById('chats-container');
         const newChatBtn = document.getElementById('new-chat-btn');
         const sendCommandBtn = document.getElementById('send-command-btn');
@@ -148,81 +131,91 @@
         let tokenActivo = "";
         let activeChatId = 1;
         let chatsList = [{ id: 1, name: "Chat inicial ☀️" }];
+        let listenInterval = null;
 
         function playClick() {
             clickSound.currentTime = 0;
             clickSound.play();
         }
 
-        // 1. CONTROL DE ACCESO ESTRICTO DESDE EL SERVIDOR
-        connectBtn.onclick = async () => {
+        // 1. GENERACIÓN DEL TOKEN ALEATORIO
+        generateBtn.onclick = () => {
             playClick();
-            errorMessage.classList.add('hidden');
-            const tokenValue = tokenField.value.trim();
-            if(!tokenValue) return;
+            
+            // Crear un token único al azar
+            const randomHex = Math.random().toString(16).substring(2, 8).toUpperCase();
+            tokenActivo = `SUNAI-${randomHex}`;
+            
+            tokenLabel.innerText = tokenActivo;
+            generateBtn.classList.add('hidden');
+            tokenDisplayBox.classList.remove('hidden');
 
-            btnConnectText.innerText = "Validando credenciales...";
-
-            try {
-                // Consultamos a Render usando el token ingresado
-                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
-                    headers: { 'Authorization': tokenValue }
-                });
-
-                // Si la API responde con un código de error (como 401 o 403), significa que la key está mal
-                if (!res.ok) {
-                    throw new Error("Acceso denegado");
-                }
-
-                // SI PASA LA VALIDACIÓN DEL SERVIDOR:
-                tokenActivo = tokenValue;
-                
-                // Extraer headers de Roblox si el plugin ya mandó datos
-                const userHeader = res.headers.get('Roblox-User') || "Desarrollador";
-                const idHeader = res.headers.get('Roblox-Id') || "1";
-
-                // Inyectar datos en la interfaz antes de mostrarla
-                robloxUsername.innerText = userHeader;
-                dynamicWelcomeTitle.innerText = `Hola, ${userHeader}.`;
-                if (idHeader !== "1") {
-                    robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
-                }
-
-                // Desvanecer pantalla de login y activar entorno Gemini
-                setupScreen.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => {
-                    setupScreen.remove();
-                    mainSidebar.classList.remove('hidden');
-                    mainContentArea.classList.remove('hidden');
-                    renderChats();
-                    // Loop constante para refrescar el perfil en segundo plano
-                    setInterval(fetchRobloxUser, 4000);
-                }, 300);
-
-            } catch (err) {
-                // Si la key es falsa o falla la red, bloqueamos el acceso
-                btnConnectText.innerText = "Verificar y Conectar";
-                errorMessage.classList.remove('hidden');
-            }
+            // Iniciar escucha activa en segundo plano: Esperamos que el plugin use este token
+            listenInterval = setInterval(checkPluginHandshake, 2000);
         };
 
-        // 2. ACTUALIZACIÓN ASÍNCRONA DEL PERFIL
-        async function fetchRobloxUser() {
+        // BOTÓN COPIAR AL PORTAPAPELES
+        copyBtn.onclick = () => {
+            playClick();
+            navigator.clipboard.writeText(tokenActivo);
+            copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>`;
+            lucide.createIcons();
+            setTimeout(() => {
+                copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`;
+                lucide.createIcons();
+            }, 1500);
+        };
+
+        // 2. ESCUCHA ACTIVA: ¿YA SE CONECTÓ EL PLUGIN DESDE STUDIO?
+        async function checkPluginHandshake() {
+            try {
+                // Le preguntamos a Render si el plugin con este token ya hizo alguna petición
+                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
+                    headers: { 'Authorization': tokenActivo }
+                });
+
+                // Si el plugin ya se conectó, el servidor de Render debería responder con cabeceras de Roblox
+                const userHeader = res.headers.get('Roblox-User');
+                const idHeader = res.headers.get('Roblox-Id');
+
+                if (userHeader) {
+                    // ¡Enlace exitoso! Frenamos las consultas de inicio
+                    clearInterval(listenInterval);
+
+                    // Configurar UI con los datos reales del avatar de Roblox
+                    robloxUsername.innerText = userHeader;
+                    dynamicWelcomeTitle.innerText = `Hola, ${userHeader}.`;
+                    if (idHeader && idHeader !== "1") {
+                        robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
+                    }
+
+                    // Transición limpia de pantallas estilo Gemini
+                    setupScreen.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        setupScreen.remove();
+                        mainSidebar.classList.remove('hidden');
+                        mainContentArea.classList.remove('hidden');
+                        renderChats();
+                        // Mantener sincronizado el perfil cada cierto tiempo
+                        setInterval(refreshProfile, 5000);
+                    }, 300);
+                }
+            } catch (e) {
+                // Esperando que Render o el plugin reaccionen
+            }
+        }
+
+        async function refreshProfile() {
             try {
                 const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
                     headers: { 'Authorization': tokenActivo }
                 });
                 const userHeader = res.headers.get('Roblox-User');
-                const idHeader = res.headers.get('Roblox-Id');
-                
                 if (userHeader) robloxUsername.innerText = userHeader;
-                if (idHeader && idHeader !== "1") {
-                    robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
-                }
             } catch(e) {}
         }
 
-        // 3. RENDERIZADO DE CHATS
+        // 3. SECCIÓN DE CHATS Y ENVIAR COMANDOS
         function renderChats() {
             chatsContainer.innerHTML = '';
             chatsList.forEach(chat => {
@@ -255,7 +248,6 @@
             renderChats();
         };
 
-        // 4. ENVÍO DE PROMPTS
         sendCommandBtn.onclick = async () => {
             playClick();
             const prompt = promptInput.value.trim();
