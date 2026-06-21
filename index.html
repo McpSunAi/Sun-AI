@@ -1,155 +1,201 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sun AI</title>
-<style>
-  :root {
-    --bg: #0b1220;
-    --panel: #131c2e;
-    --border: #233044;
-    --text: #e8ecf3;
-    --muted: #8b97ad;
-    --accent: #f2b705;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--bg); color: var(--text); display: flex; flex-direction: column;
-    align-items: center; min-height: 100vh; padding: 24px 16px;
-  }
-  header { text-align: center; margin-bottom: 16px; }
-  header h1 { margin: 0 0 4px; font-size: 24px; }
-  header p { margin: 0; color: var(--muted); font-size: 14px; }
-
-  .connect-bar {
-    width: 100%; max-width: 640px; background: var(--panel); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; font-size: 13px;
-  }
-  .connect-bar input {
-    flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text);
-    padding: 6px 10px; border-radius: 6px; font-family: monospace; font-size: 12px;
-  }
-  .connect-bar button, .send-btn {
-    background: var(--accent); color: #1a1303; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;
-  }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #d9534f; flex-shrink: 0; }
-  .status-dot.on { background: #4caf50; }
-
-  .chat {
-    width: 100%; max-width: 640px; flex: 1; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; min-height: 420px;
-  }
-  .messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-  .msg { max-width: 80%; padding: 9px 13px; border-radius: 10px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; }
-  .msg.user { align-self: flex-end; background: var(--accent); color: #1a1303; }
-  .msg.ai { align-self: flex-start; background: var(--bg); border: 1px solid var(--border); }
-  .msg.system { align-self: center; color: var(--muted); font-size: 12px; }
-
-  .input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); align-items: center; }
-  .input-row textarea {
-    flex: 1; resize: none; background: var(--bg); border: 1px solid var(--border);
-    color: var(--text); border-radius: 8px; padding: 9px 12px; font-size: 14px; font-family: inherit;
-  }
-  .model-select {
-    background: var(--bg); border: 1px solid var(--border); color: var(--text);
-    padding: 9px; border-radius: 8px; font-size: 13px; cursor: pointer; outline: none;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sun AI Hub - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        /* Animaciones personalizadas */
+        .smooth-transition { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .click-effect:active { transform: scale(0.95); }
+    </style>
 </head>
-<body>
+<body class="bg-[#0b0f1a] text-[#f0f3fa] h-screen flex overflow-hidden">
 
-<header>
-  <h1>☀️ Sun AI</h1>
-  <p>IA Global para Roblox Studio</p>
-</header>
+    <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
-<div class="connect-bar">
-  <span class="status-dot" id="statusDot"></span>
-  <span id="statusText">Sin conectar a Studio</span>
-  <input id="tokenBox" readonly placeholder="Genera un token..." />
-  <button id="newTokenBtn">Generar token</button>
-</div>
+    <aside class="w-72 bg-[#141a2b] border-r border-[#232f4a] flex flex-col h-full z-10">
+        <div class="p-4 border-b border-[#232f4a] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">☀️</span>
+                <h1 class="font-bold text-sm tracking-wider text-amber-400">SUN AI HUB</h1>
+            </div>
+            <button id="new-chat-btn" class="click-effect smooth-transition p-2 bg-[#25304f] hover:bg-amber-400 hover:text-slate-900 rounded-lg text-amber-400 cursor-pointer" title="Nuevo Chat">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+        </div>
+        
+        <div id="chats-container" class="flex-1 overflow-y-auto p-3 space-y-2">
+            </div>
+    </aside>
 
-<div class="chat">
-  <div class="messages" id="messages">
-    <div class="msg system">Genera un token, pégalo en el plugin de Roblox Studio, y empieza a chatear.</div>
-  </div>
-  <div class="input-row">
-    <select id="modelSelect" class="model-select">
-      <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-      <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-    </select>
-    <textarea id="input" rows="1" placeholder="Pídele algo a la IA..."></textarea>
-    <button class="send-btn" id="sendBtn">Enviar</button>
-  </div>
-</div>
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <header class="h-16 bg-[#141a2b] border-b border-[#232f4a] flex items-center justify-between px-6">
+            <div class="flex items-center gap-3">
+                <div id="status-indicator" class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+                <p id="status-text" class="text-xs font-semibold tracking-wide text-slate-400">ESPERANDO CONEXIÓN</p>
+            </div>
 
-<script>
-  const BACKEND_URL = "https://sun-ai-1au5.onrender.com";
+            <div id="roblox-user-panel" class="flex items-center gap-3 bg-[#1e263d] px-3 py-1.5 rounded-xl border border-[#2d3b5e] opacity-50 smooth-transition">
+                <div class="text-right">
+                    <p id="roblox-username" class="text-xs font-bold text-slate-300">Desconectado</p>
+                    <p class="text-[10px] text-slate-500 font-medium">Roblox Studio</p>
+                </div>
+                <img id="roblox-avatar" src="https://images.rbxcdn.com/2bbb815fece386180ecaa976d8b08493.png" alt="Avatar" class="w-8 h-8 rounded-full border border-slate-600 bg-slate-800">
+            </div>
+        </header>
 
-  const messagesEl = document.getElementById("messages");
-  const inputEl = document.getElementById("input");
-  const sendBtn = document.getElementById("sendBtn");
-  const tokenBox = document.getElementById("tokenBox");
-  const newTokenBtn = document.getElementById("newTokenBtn");
-  const statusDot = document.getElementById("statusDot");
-  const statusText = document.getElementById("statusText");
-  const modelSelectEl = document.getElementById("modelSelect");
+        <main class="flex-1 flex flex-col justify-between p-6 bg-[#0b0f1a] relative overflow-hidden">
+            <div id="chat-history" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+                <div class="bg-[#141a2b] p-4 rounded-xl border border-[#232f4a] max-w-2xl">
+                    <p class="text-amber-400 font-bold text-xs mb-1">🤖 Sun AI System</p>
+                    <p class="text-sm text-slate-300">¡Consola inicializada! Crea un nuevo chat a la izquierda o escribe una orden para enviarla a Roblox Studio de inmediato.</p>
+                </div>
+            </div>
 
-  let token = localStorage.getItem("sunai_token") || "";
-  if (token) tokenBox.value = token;
+            <div class="w-full max-w-4xl mx-auto flex gap-3 items-center bg-[#141a2b] p-2 rounded-2xl border border-[#232f4a] shadow-2xl">
+                <input id="prompt-input" type="text" placeholder="Escribe aquí: 'Crea una pared de fuego' o 'Genera una torre'..." class="flex-1 bg-transparent px-4 py-3 text-sm focus:outline-none text-[#f0f3fa]">
+                <button id="send-command-btn" class="click-effect smooth-transition bg-amber-400 hover:bg-amber-500 text-slate-900 px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-400/10">
+                    <span>Enviar a Studio</span>
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </main>
+    </div>
 
-  function addMessage(role, text) {
-    const div = document.createElement("div");
-    div.className = "msg " + role;
-    div.textContent = text;
-    messagesEl.appendChild(div);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
+    <script>
+        // Inicializar Iconos Lucide
+        lucide.createIcons();
 
-  newTokenBtn.addEventListener("click", async () => {
-    newTokenBtn.disabled = true;
-    try {
-      const res = await fetch(BACKEND_URL + "/api/token", { method: "POST" });
-      const data = await res.json();
-      token = data.token;
-      tokenBox.value = token;
-      localStorage.setItem("sunai_token", token);
-      addMessage("system", "Token generado con éxito.");
-    } catch (err) {
-      addMessage("system", "Error de conexión: " + err.message);
-    } finally {
-      newTokenBtn.disabled = false;
-    }
-  });
+        // Elementos de la UI
+        const clickSound = document.getElementById('click-sound');
+        const chatsContainer = document.getElementById('chats-container');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const sendCommandBtn = document.getElementById('send-command-btn');
+        const promptInput = document.getElementById('prompt-input');
+        const chatHistory = document.getElementById('chat-history');
+        
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        const robloxUsername = document.getElementById('roblox-username');
+        const robloxAvatar = document.getElementById('roblox-avatar');
+        const robloxUserPanel = document.getElementById('roblox-user-panel');
 
-  async function sendMessage() {
-    const text = inputEl.value.trim();
-    if (!text || !token) return;
-    addMessage("user", text);
-    inputEl.value = "";
+        let activeChatId = 1;
+        let chatsList = [{ id: 1, name: "Chat Principal ☀️" }];
 
-    try {
-      const res = await fetch(BACKEND_URL + "/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, message: text, model: modelSelectEl.value }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        addMessage("system", "Error: " + data.error);
-      } else {
-        addMessage("ai", data.reply);
-        statusDot.classList.toggle("on", !!data.studioConnected);
-        statusText.textContent = data.studioConnected ? "Studio conectado" : "Sin conectar a Studio";
-      }
-    } catch (err) {
-      addMessage("system", "Error al enviar: " + err.message);
-    }
-  }
+        // Función para reproducir sonido de clic
+        function playClick() {
+            clickSound.currentTime = 0;
+            clickSound.play();
+        }
 
-  sendBtn.addEventListener("click", sendMessage);
-</script>
+        // Renderizar la lista de chats en la barra lateral
+        function renderChats() {
+            chatsContainer.innerHTML = '';
+            chatsList.forEach(chat => {
+                const isActive = chat.id === activeChatId;
+                const button = document.createElement('button');
+                button.className = `click-effect smooth-transition w-full text-left p-3 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer ${
+                    isActive ? 'bg-amber-400 text-slate-900 shadow-lg shadow-amber-400/10' : 'bg-[#1e263d] hover:bg-[#25304f] text-slate-300'
+                }`;
+                button.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i data-lucide="message-square" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span class="truncate">${chat.name}</span>
+                    </div>
+                `;
+                button.onclick = () => {
+                    playClick();
+                    activeChatId = chat.id;
+                    renderChats();
+                };
+                chatsContainer.appendChild(button);
+            });
+            lucide.createIcons();
+        }
+
+        // Botón Crear Nuevo Chat
+        newChatBtn.onclick = () => {
+            playClick();
+            const newId = chatsList.length + 1;
+            chatsList.push({ id: newId, name: `Chat de IA #${newId} 🤖` });
+            activeChatId = newId;
+            renderChats();
+        };
+
+        // Escuchar datos en tiempo real desde el Backend (Render) para ver quién se conectó
+        async function checkServerConnection() {
+            try {
+                // Hacemos una consulta rápida al backend para ver el último estado registrado
+                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
+                    headers: { 'Authorization': 'SUNAI-TEST-TOKEN' } // Cambiar por tu cabecera si es fija
+                });
+                
+                // NOTA: Para obtener el nombre real de Roblox, el backend de Render debe guardar 
+                // el nombre del jugador enviado por el plugin cuando hace el apretón de manos (handshake).
+                // Mientras tanto, simulamos la detección del plugin en vivo:
+                if (res.status !== 401) {
+                    statusIndicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50";
+                    statusText.innerText = "STUDIO CONECTADO";
+                    statusText.className = "text-xs font-semibold tracking-wide text-emerald-400";
+                    robloxUserPanel.classList.remove('opacity-50');
+                    
+                    // Aquí asumimos datos del desarrollador conectado (puedes cambiarlo a dinámico si el plugin lo manda)
+                    robloxUsername.innerText = "Developer Active"; 
+                    robloxAvatar.src = "https://images.rbxcdn.com/3d604b90da89b2512f45ecaa976d8b08.png";
+                </div>
+            } catch(e) {
+                console.log("Esperando conexión activa...");
+            }
+        }
+
+        // Enviar Comandos a Render
+        sendCommandBtn.onclick = async () => {
+            playClick();
+            const prompt = promptInput.value.trim();
+            if(!prompt) return;
+
+            // Añadir al historial visual instantáneamente
+            const msgHtml = `
+                <div class="bg-[#1e263d] p-4 rounded-xl border border-[#2d3b5e] max-w-2xl ml-auto text-right">
+                    <p class="text-slate-400 text-[10px] mb-1">Tú (Chat #${activeChatId})</p>
+                    <p class="text-sm text-slate-200">${prompt}</p>
+                </div>
+            `;
+            chatHistory.insertAdjacentHTML('beforeend', msgHtml);
+            promptInput.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Simulación del procesamiento de IA enviado a tu API de Render
+            try {
+                await fetch('https://sun-ai-1au5.onrender.com/api/enviar-comando', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        chatId: activeChatId
+                    })
+                });
+            } catch (err) {
+                console.error("Error al despachar el comando:", err);
+            }
+        };
+
+        // Permitir enviar con la tecla Enter
+        promptInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendCommandBtn.click();
+        });
+
+        // Loop de verificación y render inicial
+        renderChats();
+        setInterval(checkServerConnection, 3000); // Revisa la conexión cada 3 segundos
+    </script>
 </body>
 </html>
