@@ -20,7 +20,6 @@
 
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
-    <!-- PANTALLA DE INICIO (VINCULACIÓN) -->
     <div id="setup-screen" class="fixed inset-0 bg-[#0d1117] flex flex-col items-center justify-center z-50 p-6 smooth">
         <div class="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="text-5xl animate-bounce">☀️</div>
@@ -35,15 +34,21 @@
                     <span>Generar Token Único</span>
                 </button>
 
-                <div id="token-display-box" class="hidden space-y-3 pt-2">
+                <div id="token-display-box" class="hidden space-y-4 pt-2">
                     <div class="flex items-center justify-between bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3">
                         <span id="generated-token" class="font-mono text-amber-400 font-bold text-base tracking-wider">SUNAI-XXXXXX</span>
-                        <button id="copy-token-btn" class="text-[#8b949e] hover:text-white p-1 smooth cursor-pointer">
+                        <button id="copy-token-btn" class="text-[#8b949e] hover:text-white p-2 bg-[#21262d] rounded-lg border border-[#30363d] smooth cursor-pointer flex items-center justify-center">
                             <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
                     </div>
-                    <div class="flex items-center justify-center gap-2 text-xs text-slate-400 py-2">
-                        <div class="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+
+                    <a href="https://create.roblox.com/store/asset/119769170177527/SunAIConector" target="_blank" class="click-pop smooth w-full py-2.5 bg-[#00a2ff] hover:bg-[#008edb] text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md">
+                        <img src="https://images.rbxcdn.com/2bbb815fece386180ecaa976d8b08493.png" class="w-4 h-4 invert brightness-200" alt="Roblox">
+                        <span>¿No tienes el Plugin? Descárgalo aquí</span>
+                    </a>
+
+                    <div class="flex items-center justify-center gap-2 text-xs text-slate-400 py-1">
+                        <div class="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
                         <span>Esperando enlace desde Roblox Studio...</span>
                     </div>
                 </div>
@@ -51,7 +56,6 @@
         </div>
     </div>
 
-    <!-- INTERFAZ PRINCIPAL -->
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
@@ -59,10 +63,8 @@
                 <span>Nuevo chat</span>
             </button>
         </div>
-        <!-- Contenedor de Historial -->
         <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1"></div>
         
-        <!-- Botón de Cerrar Sesión / Cambiar Cuenta -->
         <div class="p-4 border-t border-[#30363d]">
             <button id="logout-btn" class="w-full py-2 bg-red-950/40 hover:bg-red-900/60 border border-red-800/60 text-red-400 text-xs font-semibold rounded-lg smooth cursor-pointer flex items-center justify-center gap-2">
                 <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Cambiar de Cuenta / Salir
@@ -101,7 +103,6 @@
         </main>
     </div>
 
-    <!-- MENÚ CONTEXTUAL FLOTANTE (CLIC DERECHO) -->
     <div id="context-menu" class="hidden absolute bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl py-1 w-40 z-50 text-xs">
         <button id="ctx-rename" class="w-full text-left px-4 py-2 hover:bg-[#21262d] text-white flex items-center gap-2"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Renombrar</button>
         <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-red-950/50 text-red-400 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar</button>
@@ -116,6 +117,7 @@
         const generateBtn = document.getElementById('generate-token-btn');
         const tokenDisplayBox = document.getElementById('token-display-box');
         const tokenLabel = document.getElementById('generated-token');
+        const copyBtn = document.getElementById('copy-token-btn');
         const chatsContainer = document.getElementById('chats-container');
         const chatHistory = document.getElementById('chat-history');
         const promptInput = document.getElementById('prompt-input');
@@ -131,10 +133,7 @@
 
         function playClick() { clickSound.currentTime = 0; clickSound.play(); }
 
-        // Verificar estado al cargar la página
-        if (tokenActivo && userData) {
-            entrarAlWorkspace();
-        }
+        if (tokenActivo && userData) { entrarAlWorkspace(); }
 
         generateBtn.onclick = async () => {
             playClick();
@@ -143,6 +142,19 @@
             tokenLabel.innerText = tokenActivo;
             generateBtn.classList.add('hidden');
             tokenDisplayBox.classList.remove('hidden');
+
+            // BOTÓN COPIAR REPARADO AQUÍ (Asignación Directa y Segura)
+            copyBtn.onclick = () => {
+                playClick();
+                navigator.clipboard.writeText(tokenActivo).then(() => {
+                    copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>`;
+                    lucide.createIcons();
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`;
+                        lucide.createIcons();
+                    }, 1500);
+                });
+            };
 
             try {
                 await fetch('https://sun-ai-1au5.onrender.com/api/registrar-token', {
@@ -171,7 +183,7 @@
         }
 
         function entrarAlWorkspace() {
-            setupScreen.remove();
+            if(setupScreen) setupScreen.remove();
             mainSidebar.classList.remove('hidden');
             mainContentArea.classList.remove('hidden');
             document.getElementById('roblox-username').innerText = userData.name;
@@ -192,11 +204,10 @@
                 
                 btn.onclick = () => { playClick(); activeChatId = chat.id; localStorage.setItem('sunai_active_chat', activeChatId); renderChats(); loadActiveChatMessages(); };
                 
-                // Evento Clic Derecho (Menu Contextual)
                 btn.oncontextmenu = (e) => {
                     e.preventDefault();
                     rightClickedChatId = chat.id;
-                    contextMenu.style.top = `${e.pageY} winners` ? `${e.pageY}px` : `${e.pageY}px`;
+                    contextMenu.style.top = `${e.pageY}px`;
                     contextMenu.style.left = `${e.pageX}px`;
                     contextMenu.classList.remove('hidden');
                 };
@@ -207,7 +218,6 @@
             lucide.createIcons();
         }
 
-        // Acciones del Clic Derecho
         document.getElementById('ctx-rename').onclick = () => {
             contextMenu.classList.add('hidden');
             const nuevoNombre = prompt("Introduce el nuevo nombre del chat:");
@@ -283,7 +293,7 @@
                 chat.messages.push({ role: 'model', model: mod.toUpperCase(), text: data.reply || "Sin respuesta." });
                 renderChats();
                 loadActiveChatMessages();
-            } catch (err) { document.getElementById(loadingId).remove(); }
+            } catch (err) { if(document.getElementById(loadingId)) document.getElementById(loadingId).remove(); }
         };
 
         document.getElementById('logout-btn').onclick = () => {
