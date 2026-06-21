@@ -29,7 +29,7 @@
             </div>
 
             <div class="space-y-4">
-                <button id="generate-token-btn" class="click-pop smooth w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-[#0d1117] font-bold rounded-xl text-sm cursor-pointer shadow-lg shadow-amber-400/10 flex items-center justify-center gap-2">
+                <button id="generate-token-btn" class="click-pop smooth w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-[#0d1117] font-bold rounded-xl text-sm cursor-pointer shadow-lg flex items-center justify-center gap-2">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
                     <span>Generar Token Único</span>
                 </button>
@@ -37,11 +37,10 @@
                 <div id="token-display-box" class="hidden space-y-3 pt-2">
                     <div class="flex items-center justify-between bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3">
                         <span id="generated-token" class="font-mono text-amber-400 font-bold text-base tracking-wider">SUNAI-XXXXXX</span>
-                        <button id="copy-token-btn" class="text-[#8b949e] hover:text-white p-1 smooth cursor-pointer" title="Copiar Token">
+                        <button id="copy-token-btn" class="text-[#8b949e] hover:text-white p-1 smooth cursor-pointer">
                             <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
                     </div>
-                    
                     <div class="flex items-center justify-center gap-2 text-xs text-slate-400 py-2">
                         <div class="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
                         <span>Esperando enlace desde el plugin de Roblox...</span>
@@ -51,30 +50,23 @@
         </div>
     </div>
 
-
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
                 <i data-lucide="plus" class="w-4 h-4 text-amber-400"></i>
                 <span>Nuevo chat</span>
             </button>
-            
             <div class="flex items-center bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2">
                 <i data-lucide="search" class="w-3.5 h-3.5 text-[#8b949e] mr-2"></i>
                 <input id="search-chats" type="text" placeholder="Buscar chats..." class="bg-transparent text-xs w-full focus:outline-none text-white">
             </div>
         </div>
-        
         <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1"></div>
     </aside>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden hidden" id="main-content-area">
-        
         <header class="h-16 border-b border-[#30363d] bg-[#0d1117] flex items-center justify-between px-8">
-            <div class="flex items-center gap-2">
-                <span class="text-[#8b949e] text-xs font-medium uppercase tracking-widest bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]">Workspace Activo</span>
-            </div>
-
+            <div><span class="text-[#8b949e] text-xs font-medium uppercase bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]">Workspace Activo</span></div>
             <div class="flex items-center gap-3 bg-[#161b22] border border-[#30363d] px-4 py-1.5 rounded-full">
                 <div class="text-right">
                     <p id="roblox-username" class="text-xs font-bold text-white">Cargando...</p>
@@ -91,10 +83,9 @@
             <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2">
                 <div id="welcome-message-container" class="h-full flex flex-col justify-center py-12 space-y-2">
                     <h2 class="text-4xl font-semibold bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-200 bg-clip-text text-transparent" id="dynamic-welcome-title">Hola, Desarrollador.</h2>
-                    <p class="text-2xl font-medium text-[#8b949e]">¿Qué estructura o script quieres construir hoy en tu mapa?</p>
+                    <p class="text-2xl font-medium text-[#8b949e]">¿Qué estructura quieres construir hoy en tu mapa?</p>
                 </div>
             </div>
-
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-5 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white placeholder-[#8b949e]">
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
@@ -106,24 +97,20 @@
 
     <script>
         lucide.createIcons();
-
         const clickSound = document.getElementById('click-sound');
         const setupScreen = document.getElementById('setup-screen');
         const mainSidebar = document.getElementById('main-sidebar');
         const mainContentArea = document.getElementById('main-content-area');
-        
         const generateBtn = document.getElementById('generate-token-btn');
         const tokenDisplayBox = document.getElementById('token-display-box');
         const tokenLabel = document.getElementById('generated-token');
         const copyBtn = document.getElementById('copy-token-btn');
-
         const chatsContainer = document.getElementById('chats-container');
         const newChatBtn = document.getElementById('new-chat-btn');
         const sendCommandBtn = document.getElementById('send-command-btn');
         const promptInput = document.getElementById('prompt-input');
         const chatHistory = document.getElementById('chat-history');
         const welcomeMessage = document.getElementById('welcome-message-container');
-        
         const robloxUsername = document.getElementById('roblox-username');
         const robloxAvatar = document.getElementById('roblox-avatar');
         const dynamicWelcomeTitle = document.getElementById('dynamic-welcome-title');
@@ -133,136 +120,92 @@
         let chatsList = [{ id: 1, name: "Chat inicial ☀️" }];
         let listenInterval = null;
 
-        function playClick() {
-            clickSound.currentTime = 0;
-            clickSound.play();
-        }
+        function playClick() { clickSound.currentTime = 0; clickSound.play(); }
 
-        // 1. GENERACIÓN DEL TOKEN ALEATORIO
-        generateBtn.onclick = () => {
+        generateBtn.onclick = async () => {
             playClick();
-            
-            // Crear un token único al azar
             const randomHex = Math.random().toString(16).substring(2, 8).toUpperCase();
             tokenActivo = `SUNAI-${randomHex}`;
-            
             tokenLabel.innerText = tokenActivo;
             generateBtn.classList.add('hidden');
             tokenDisplayBox.classList.remove('hidden');
 
-            // Iniciar escucha activa en segundo plano: Esperamos que el plugin use este token
+            try {
+                await fetch('https://sun-ai-1au5.onrender.com/api/registrar-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: tokenActivo })
+                });
+            } catch(e) { console.error(e); }
+
             listenInterval = setInterval(checkPluginHandshake, 2000);
         };
 
-        // BOTÓN COPIAR AL PORTAPAPELES
         copyBtn.onclick = () => {
             playClick();
             navigator.clipboard.writeText(tokenActivo);
             copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>`;
             lucide.createIcons();
-            setTimeout(() => {
-                copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`;
-                lucide.createIcons();
-            }, 1500);
+            setTimeout(() => { copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`; lucide.createIcons(); }, 1500);
         };
 
-        // 2. ESCUCHA ACTIVA: ¿YA SE CONECTÓ EL PLUGIN DESDE STUDIO?
         async function checkPluginHandshake() {
             try {
-                // Le preguntamos a Render si el plugin con este token ya hizo alguna petición
                 const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
                     headers: { 'Authorization': tokenActivo }
                 });
-
-                // Si el plugin ya se conectó, el servidor de Render debería responder con cabeceras de Roblox
                 const userHeader = res.headers.get('Roblox-User');
                 const idHeader = res.headers.get('Roblox-Id');
 
-                if (userHeader) {
-                    // ¡Enlace exitoso! Frenamos las consultas de inicio
+                if (userHeader && userHeader !== "") {
                     clearInterval(listenInterval);
-
-                    // Configurar UI con los datos reales del avatar de Roblox
                     robloxUsername.innerText = userHeader;
                     dynamicWelcomeTitle.innerText = `Hola, ${userHeader}.`;
                     if (idHeader && idHeader !== "1") {
                         robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
                     }
-
-                    // Transición limpia de pantallas estilo Gemini
                     setupScreen.classList.add('opacity-0', 'scale-95');
                     setTimeout(() => {
                         setupScreen.remove();
                         mainSidebar.classList.remove('hidden');
                         mainContentArea.classList.remove('hidden');
                         renderChats();
-                        // Mantener sincronizado el perfil cada cierto tiempo
                         setInterval(refreshProfile, 5000);
                     }, 300);
                 }
-            } catch (e) {
-                // Esperando que Render o el plugin reaccionen
-            }
+            } catch (e) {}
         }
 
         async function refreshProfile() {
             try {
-                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
-                    headers: { 'Authorization': tokenActivo }
-                });
+                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', { headers: { 'Authorization': tokenActivo } });
                 const userHeader = res.headers.get('Roblox-User');
                 if (userHeader) robloxUsername.innerText = userHeader;
             } catch(e) {}
         }
 
-        // 3. SECCIÓN DE CHATS Y ENVIAR COMANDOS
         function renderChats() {
             chatsContainer.innerHTML = '';
             chatsList.forEach(chat => {
                 const isActive = chat.id === activeChatId;
                 const btn = document.createElement('button');
-                btn.className = `click-pop smooth w-full text-left px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${
-                    isActive ? 'bg-[#30363d] text-white font-semibold' : 'text-[#8b949e] hover:bg-[#21262d] hover:text-[#c9d1d9]'
-                }`;
-                btn.innerHTML = `
-                    <div class="flex items-center gap-2.5 overflow-hidden">
-                        <i data-lucide="message-square" class="w-3.5 h-3.5 opacity-70"></i>
-                        <span class="truncate">${chat.name}</span>
-                    </div>
-                `;
-                btn.onclick = () => {
-                    playClick();
-                    activeChatId = chat.id;
-                    renderChats();
-                };
+                btn.className = `click-pop smooth w-full text-left px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${isActive ? 'bg-[#30363d] text-white font-semibold' : 'text-[#8b949e] hover:bg-[#21262d]'}`;
+                btn.innerHTML = `<div class="flex items-center gap-2.5 overflow-hidden"><i data-lucide="message-square" class="w-3.5 h-3.5 opacity-70"></i><span class="truncate">${chat.name}</span></div>`;
+                btn.onclick = () => { playClick(); activeChatId = chat.id; renderChats(); };
                 chatsContainer.appendChild(btn);
             });
             lucide.createIcons();
         }
 
-        newChatBtn.onclick = () => {
-            playClick();
-            const newId = chatsList.length + 1;
-            chatsList.push({ id: newId, name: `Conversación de IA #${newId}` });
-            activeChatId = newId;
-            renderChats();
-        };
+        newChatBtn.onclick = () => { playClick(); const newId = chatsList.length + 1; chatsList.push({ id: newId, name: `Conversación #${newId}` }); activeChatId = newId; renderChats(); };
 
         sendCommandBtn.onclick = async () => {
             playClick();
             const prompt = promptInput.value.trim();
             if(!prompt) return;
-
             if(welcomeMessage) welcomeMessage.remove();
 
-            const userMsg = `
-                <div class="flex items-start gap-4 max-w-3xl justify-end ml-auto">
-                    <div class="bg-[#21262d] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-white">
-                        ${prompt}
-                    </div>
-                </div>
-            `;
-            chatHistory.insertAdjacentHTML('beforeend', userMsg);
+            chatHistory.insertAdjacentHTML('beforeend', `<div class="flex items-start gap-4 max-w-3xl justify-end ml-auto"><div class="bg-[#21262d] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-white">${prompt}</div></div>`);
             promptInput.value = '';
             chatHistory.scrollTop = chatHistory.scrollHeight;
 
@@ -274,10 +217,7 @@
                 });
             } catch (err) {}
         };
-
-        promptInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendCommandBtn.click();
-        });
+        promptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendCommandBtn.click(); });
     </script>
 </body>
 </html>
