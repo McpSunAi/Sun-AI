@@ -4,40 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sun AI - Gemini Workspace</title>
+    <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Iconos Premium Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0d1117; }
         .smooth { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .click-pop:active { transform: scale(0.97); }
-        /* Scrollbar estilo minimalista */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #21262d; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #30363d; }
     </style>
 </head>
 <body class="text-[#c9d1d9] h-screen flex overflow-hidden">
 
+    <!-- AUDIO PARA SONIDOS DE CLIC -->
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
+    <!-- ========================================== -->
+    <!-- 1. PANTALLA DE INICIO (BLOQUEADA POR LLAVE) -->
+    <!-- ========================================== -->
     <div id="setup-screen" class="fixed inset-0 bg-[#0d1117] flex flex-col items-center justify-center z-50 p-6 smooth">
         <div class="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="text-5xl animate-bounce">☀️</div>
             <div>
-                <h2 class="text-2xl font-bold text-white tracking-tight">Bienvenido a Sun AI</h2>
-                <p class="text-sm text-[#8b949e] mt-2">Configura tu llave de acceso para vincular la IA con Roblox Studio.</p>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Vincular Sun AI</h2>
+                <p class="text-sm text-[#8b949e] mt-2">Introduce tu token activo. Recuerda que primero debes darle a "Conectar" en el plugin de Roblox Studio.</p>
             </div>
 
+            <!-- Input Form -->
             <div class="space-y-4 text-left">
                 <label class="text-xs font-semibold text-[#8b949e] uppercase tracking-wider block">Tu Token de Conexión</label>
                 <div class="flex items-center bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3 focus-within:border-amber-400 smooth">
                     <i data-lucide="key" class="w-4 h-4 text-[#8b949e] mr-3"></i>
                     <input id="token-input-field" type="password" placeholder="SUNAI-XXXXXX" class="w-full bg-transparent text-sm focus:outline-none text-white font-mono">
                 </div>
+                <!-- Alerta de Error Oculta -->
+                <p id="error-message" class="text-xs text-red-400 font-medium hidden flex items-center gap-1">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                    <span>Token inválido o Studio desconectado.</span>
+                </p>
             </div>
 
+            <!-- Botón de Conexión -->
             <button id="connect-submit-btn" class="click-pop smooth w-full py-3.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] font-bold rounded-xl text-sm cursor-pointer shadow-lg shadow-amber-400/10 flex items-center justify-center gap-2">
                 <span id="btn-connect-text">Verificar y Conectar</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -46,6 +57,11 @@
     </div>
 
 
+    <!-- ========================================== -->
+    <!-- 2. INTERFAZ PRINCIPAL (ESTILO GEMINI) -->
+    <!-- ========================================== -->
+    
+    <!-- BARRA LATERAL (SIDEBAR) -->
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
@@ -59,20 +75,22 @@
             </div>
         </div>
         
-        <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1">
-            </div>
+        <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1"></div>
     </aside>
 
+    <!-- ÁREA DE TRABAJO PRINCIPAL -->
     <div class="flex-1 flex flex-col h-full overflow-hidden hidden" id="main-content-area">
         
+        <!-- TOPBAR CON PERFIL -->
         <header class="h-16 border-b border-[#30363d] bg-[#0d1117] flex items-center justify-between px-8">
             <div class="flex items-center gap-2">
-                <span class="text-[#8b949e] text-xs font-medium uppercase tracking-widest bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]" id="workspace-indicator">Workspace Activo</span>
+                <span class="text-[#8b949e] text-xs font-medium uppercase tracking-widest bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]">Workspace Activo</span>
             </div>
 
+            <!-- Panel de Perfil de Roblox Sincronizado -->
             <div class="flex items-center gap-3 bg-[#161b22] border border-[#30363d] px-4 py-1.5 rounded-full">
                 <div class="text-right">
-                    <p id="roblox-username" class="text-xs font-bold text-white">Buscando...</p>
+                    <p id="roblox-username" class="text-xs font-bold text-white">Cargando...</p>
                     <div class="flex items-center justify-end gap-1">
                         <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                         <span class="text-[10px] text-emerald-400 font-medium">Studio Link</span>
@@ -82,24 +100,28 @@
             </div>
         </header>
 
+        <!-- CONTENEDOR DE CONVERSACIÓN -->
         <main class="flex-1 flex flex-col justify-between p-8 max-w-4xl w-full mx-auto relative overflow-hidden">
-            
             <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2">
                 <div id="welcome-message-container" class="h-full flex flex-col justify-center py-12 space-y-2">
-                    <h2 class="text-4xl font-semibold bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-200 bg-clip-text text-transparent">Hola, Desarrollador.</h2>
+                    <h2 class="text-4xl font-semibold bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-200 bg-clip-text text-transparent" id="dynamic-welcome-title">Hola, Desarrollador.</h2>
                     <p class="text-2xl font-medium text-[#8b949e]">¿Qué estructura o script quieres construir hoy en tu mapa?</p>
                 </div>
             </div>
 
+            <!-- Caja de Entrada Estilo Gemini -->
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-5 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white placeholder-[#8b949e]">
-                <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer" title="Enviar comando">
+                <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </div>
         </main>
     </div>
 
+    <!-- ========================================== -->
+    <!-- LOGICA DE CONTROL DE FLUJO -->
+    <!-- ========================================== -->
     <script>
         lucide.createIcons();
 
@@ -110,6 +132,7 @@
         const tokenField = document.getElementById('token-input-field');
         const connectBtn = document.getElementById('connect-submit-btn');
         const btnConnectText = document.getElementById('btn-connect-text');
+        const errorMessage = document.getElementById('error-message');
         
         const chatsContainer = document.getElementById('chats-container');
         const newChatBtn = document.getElementById('new-chat-btn');
@@ -120,6 +143,7 @@
         
         const robloxUsername = document.getElementById('roblox-username');
         const robloxAvatar = document.getElementById('roblox-avatar');
+        const dynamicWelcomeTitle = document.getElementById('dynamic-welcome-title');
 
         let tokenActivo = "";
         let activeChatId = 1;
@@ -130,56 +154,75 @@
             clickSound.play();
         }
 
-        // 1. LÓGICA DE CONEXIÓN E INICIO
+        // 1. CONTROL DE ACCESO ESTRICTO DESDE EL SERVIDOR
         connectBtn.onclick = async () => {
             playClick();
+            errorMessage.classList.add('hidden');
             const tokenValue = tokenField.value.trim();
             if(!tokenValue) return;
 
-            btnConnectText.innerText = "Estableciendo enlace...";
-            
-            // Esperamos simulación de handshake seguro con el servidor de Render
-            setTimeout(() => {
+            btnConnectText.innerText = "Validando credenciales...";
+
+            try {
+                // Consultamos a Render usando el token ingresado
+                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
+                    headers: { 'Authorization': tokenValue }
+                });
+
+                // Si la API responde con un código de error (como 401 o 403), significa que la key está mal
+                if (!res.ok) {
+                    throw new Error("Acceso denegado");
+                }
+
+                // SI PASA LA VALIDACIÓN DEL SERVIDOR:
                 tokenActivo = tokenValue;
                 
-                // Animación de salida de la pantalla de Login
+                // Extraer headers de Roblox si el plugin ya mandó datos
+                const userHeader = res.headers.get('Roblox-User') || "Desarrollador";
+                const idHeader = res.headers.get('Roblox-Id') || "1";
+
+                // Inyectar datos en la interfaz antes de mostrarla
+                robloxUsername.innerText = userHeader;
+                dynamicWelcomeTitle.innerText = `Hola, ${userHeader}.`;
+                if (idHeader !== "1") {
+                    robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
+                }
+
+                // Desvanecer pantalla de login y activar entorno Gemini
                 setupScreen.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
                     setupScreen.remove();
-                    // Revelar interfaz Gemini
                     mainSidebar.classList.remove('hidden');
                     mainContentArea.classList.remove('hidden');
                     renderChats();
-                    // Iniciar bucle de escucha del jugador real
-                    setInterval(fetchRobloxUser, 2500);
+                    // Loop constante para refrescar el perfil en segundo plano
+                    setInterval(fetchRobloxUser, 4000);
                 }, 300);
-            }, 1200);
+
+            } catch (err) {
+                // Si la key es falsa o falla la red, bloqueamos el acceso
+                btnConnectText.innerText = "Verificar y Conectar";
+                errorMessage.classList.remove('hidden');
+            }
         };
 
-        // 2. EXTRAER IDENTIDAD EN TIEMPO REAL DESDE EL CONNECTOR DE STUDIO
+        // 2. ACTUALIZACIÓN ASÍNCRONA DEL PERFIL
         async function fetchRobloxUser() {
             try {
                 const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
                     headers: { 'Authorization': tokenActivo }
                 });
+                const userHeader = res.headers.get('Roblox-User');
+                const idHeader = res.headers.get('Roblox-Id');
                 
-                // Si el plugin local está inyectando las cabeceras, las leemos
-                // De lo contrario, usamos el sistema inteligente de Render fallback
-                const userHeader = res.headers.get('Roblox-User') || "Dev_Active";
-                const idHeader = res.headers.get('Roblox-Id') || "1";
-                
-                robloxUsername.innerText = userHeader;
-                if (idHeader !== "1") {
+                if (userHeader) robloxUsername.innerText = userHeader;
+                if (idHeader && idHeader !== "1") {
                     robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
-                } else {
-                    robloxAvatar.src = "https://images.rbxcdn.com/3d604b90da89b2512f45ecaa976d8b08.png";
                 }
-            } catch(e) {
-                // Mantener estado buscando si el backend tarda en responder
-            }
+            } catch(e) {}
         }
 
-        // 3. CONTROL DE CHATS (ESTILO GEMINI)
+        // 3. RENDERIZADO DE CHATS
         function renderChats() {
             chatsContainer.innerHTML = '';
             chatsList.forEach(chat => {
@@ -212,7 +255,7 @@
             renderChats();
         };
 
-        // 4. DESPACHAR COMANDOS AL ENTORNO DE ROBLOX
+        // 4. ENVÍO DE PROMPTS
         sendCommandBtn.onclick = async () => {
             playClick();
             const prompt = promptInput.value.trim();
@@ -220,10 +263,9 @@
 
             if(welcomeMessage) welcomeMessage.remove();
 
-            // Mensaje del Usuario
             const userMsg = `
                 <div class="flex items-start gap-4 max-w-3xl justify-end ml-auto">
-                    <div class="bg-[#21262d] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-white shadow-sm">
+                    <div class="bg-[#21262d] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-white">
                         ${prompt}
                     </div>
                 </div>
@@ -232,16 +274,13 @@
             promptInput.value = '';
             chatHistory.scrollTop = chatHistory.scrollHeight;
 
-            // Enviar acción al backend en Render
             try {
                 await fetch('https://sun-ai-1au5.onrender.com/api/enviar-comando', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': tokenActivo },
                     body: JSON.stringify({ prompt: prompt, chatId: activeChatId })
                 });
-            } catch (err) {
-                console.error("Fallo de red al despachar el prompt:", err);
-            }
+            } catch (err) {}
         };
 
         promptInput.addEventListener('keypress', (e) => {
