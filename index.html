@@ -20,7 +20,7 @@
 
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
-    <!-- PANTALLA DE INICIO (VINCULACIÓN) -->
+    <!-- SETUP SCREEN -->
     <div id="setup-screen" class="fixed inset-0 bg-[#0d1117] flex flex-col items-center justify-center z-50 p-6 smooth">
         <div class="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="text-5xl animate-bounce">☀️</div>
@@ -28,13 +28,11 @@
                 <h2 class="text-2xl font-bold text-white tracking-tight">Vincular Sun AI Global</h2>
                 <p class="text-sm text-[#8b949e] mt-2">Genera un token de acceso y pégalo dentro de tu plugin en Roblox Studio.</p>
             </div>
-
             <div class="space-y-4">
                 <button id="generate-token-btn" class="click-pop smooth w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-[#0d1117] font-bold rounded-xl text-sm cursor-pointer shadow-lg flex items-center justify-center gap-2">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
                     <span>Generar Token Único</span>
                 </button>
-
                 <div id="token-display-box" class="hidden space-y-4 pt-2">
                     <div class="flex items-center justify-between bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3">
                         <span id="generated-token" class="font-mono text-amber-400 font-bold text-base tracking-wider">SUNAI-XXXXXX</span>
@@ -42,12 +40,10 @@
                             <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
                     </div>
-
                     <a href="https://create.roblox.com/store/asset/119769170177527/SunAIConector" target="_blank" class="click-pop smooth w-full py-2.5 bg-[#00a2ff] hover:bg-[#008edb] text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md">
                         <img src="https://images.rbxcdn.com/2bbb815fece386180ecaa976d8b08493.png" class="w-4 h-4 invert brightness-200" alt="Roblox">
                         <span>¿No tienes el Plugin? Descárgalo aquí</span>
                     </a>
-
                     <div class="flex items-center justify-center gap-2 text-xs text-slate-400 py-1">
                         <div class="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
                         <span>Esperando enlace desde Roblox Studio...</span>
@@ -57,7 +53,7 @@
         </div>
     </div>
 
-    <!-- BARRA LATERAL (HISTORIAL) -->
+    <!-- SIDEBAR -->
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
@@ -66,7 +62,6 @@
             </button>
         </div>
         <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1"></div>
-        
         <div class="p-4 border-t border-[#30363d]">
             <button id="logout-btn" class="w-full py-2 bg-red-950/40 hover:bg-red-900/60 border border-red-800/60 text-red-400 text-xs font-semibold rounded-lg smooth cursor-pointer flex items-center justify-center gap-2">
                 <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Cambiar de Cuenta / Salir
@@ -74,7 +69,7 @@
         </div>
     </aside>
 
-    <!-- VENTANA PRINCIPAL DE CHAT -->
+    <!-- MAIN CHAT INTERFACE -->
     <div class="flex-1 flex flex-col h-full overflow-hidden hidden" id="main-content-area">
         <header class="h-16 border-b border-[#30363d] bg-[#0d1117] flex items-center justify-between px-8">
             <div><span class="text-[#8b949e] text-xs font-medium uppercase bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]">Workspace Activo</span></div>
@@ -94,8 +89,6 @@
             <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2"></div>
             
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-4 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
-                
-                <!-- SELECTOR CONFIGURADO CON LOS NOMBRES EXCLUSIVOS -->
                 <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] cursor-pointer smooth hover:border-amber-400 max-w-[190px] focus:outline-none">
                     <optgroup label="☀️ Google Gemini" class="bg-[#161b22]">
                         <option value="gemini-2.5-flash" selected>🚀 Gemini 2.5 Flash</option>
@@ -115,7 +108,7 @@
         </main>
     </div>
 
-    <!-- MENÚ CONTEXTUAL (CLIC DERECHO) -->
+    <!-- CONTEXT MENU -->
     <div id="context-menu" class="hidden absolute bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl py-1 w-40 z-50 text-xs">
         <button id="ctx-rename" class="w-full text-left px-4 py-2 hover:bg-[#21262d] text-white flex items-center gap-2"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Renombrar</button>
         <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-red-950/50 text-red-400 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar</button>
@@ -144,7 +137,6 @@
         let rightClickedChatId = null;
         let listenInterval = null;
 
-        // Diccionario para transformar los IDs reales en nombres de interfaz avanzados
         const nombresCoolModelos = {
             'gemini-2.5-flash': 'GEMINI 2.5 FLASH',
             'gemini-2.5-pro': 'GEMINI 2.5 PRO (QUANTUM)',
@@ -169,10 +161,7 @@
                 navigator.clipboard.writeText(tokenActivo).then(() => {
                     copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>`;
                     lucide.createIcons();
-                    setTimeout(() => {
-                        copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`;
-                        lucide.createIcons();
-                    }, 1500);
+                    setTimeout(() => { copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`; lucide.createIcons(); }, 1500);
                 });
             };
 
@@ -221,7 +210,6 @@
                 const btn = document.createElement('button');
                 btn.className = `click-pop smooth w-full text-left px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${isActive ? 'bg-[#30363d] text-white' : 'text-[#8b949e] hover:bg-[#21262d]'}`;
                 btn.innerHTML = `<div class="flex items-center gap-2.5 truncate"><i data-lucide="message-square" class="w-3.5 h-3.5"></i><span class="truncate">${chat.name}</span></div>`;
-                
                 btn.onclick = () => { playClick(); activeChatId = chat.id; localStorage.setItem('sunai_active_chat', activeChatId); renderChats(); loadActiveChatMessages(); };
                 btn.oncontextmenu = (e) => { e.preventDefault(); rightClickedChatId = chat.id; contextMenu.style.top = `${e.pageY}px`; contextMenu.style.left = `${e.pageX}px`; contextMenu.classList.remove('hidden'); };
                 chatsContainer.appendChild(btn);
@@ -273,7 +261,9 @@
                     chatHistory.insertAdjacentHTML('beforeend', `<div class="flex justify-end ml-auto"><div class="bg-[#21262d] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white max-w-xl">${msg.text}</div></div>`);
                 } else {
                     const tagCool = nombresCoolModelos[msg.model] || msg.model;
-                    chatHistory.insertAdjacentHTML('beforeend', `<div class="flex flex-col gap-1"><span class="text-[9px] text-amber-400 font-mono font-bold bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d] w-max">🤖 ${tagCool}</span><div class="bg-[#161b22] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white whitespace-pre-wrap max-w-xl">${msg.text}</div></div>`);
+                    const esError = msg.text.startsWith('⚠️');
+                    const fondoClase = esError ? 'bg-red-950/30 border-red-800/50 text-red-200' : 'bg-[#161b22] border-[#30363d] text-white';
+                    chatHistory.insertAdjacentHTML('beforeend', `<div class="flex flex-col gap-1"><span class="text-[9px] ${esError ? 'text-red-400' : 'text-amber-400'} font-mono font-bold bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d] w-max">🤖 ${tagCool}</span><div class="${fondoClase} border px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap max-w-xl">${msg.text}</div></div>`);
                 }
             });
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -300,13 +290,25 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: tokenActivo, message: prompt, model: mod })
                 });
-                const data = await response.json();
-                document.getElementById(loadingId).remove();
                 
-                chat.messages.push({ role: 'model', model: mod, text: data.reply || "Sin respuesta." });
+                const data = await response.json();
+                if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                
+                if (data.reply) {
+                    chat.messages.push({ role: 'model', model: mod, text: data.reply });
+                } else if (data.error) {
+                    chat.messages.push({ role: 'model', model: mod, text: `⚠️ ERROR: ${data.error}` });
+                } else {
+                    chat.messages.push({ role: 'model', model: mod, text: "⚠️ Ocurrió una respuesta desconocida desde el servidor." });
+                }
                 renderChats();
                 loadActiveChatMessages();
-            } catch (err) { if(document.getElementById(loadingId)) document.getElementById(loadingId).remove(); }
+            } catch (err) { 
+                if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                chat.messages.push({ role: 'model', model: mod, text: `⚠️ ERROR DE RED: No se pudo conectar con el servidor backend en Render. Verifica si está encendido.` });
+                renderChats();
+                loadActiveChatMessages();
+            }
         };
 
         document.getElementById('logout-btn').onclick = () => { localStorage.clear(); window.location.reload(); };
