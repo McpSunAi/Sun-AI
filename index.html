@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sun AI - Gemini Workspace</title>
+    <title>Sun AI - Gemini & Claude Workspace</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -20,6 +20,7 @@
 
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
+    <!-- PANTALLA DE INICIO (VINCULACIÓN) -->
     <div id="setup-screen" class="fixed inset-0 bg-[#0d1117] flex flex-col items-center justify-center z-50 p-6 smooth">
         <div class="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="text-5xl animate-bounce">☀️</div>
@@ -56,6 +57,7 @@
         </div>
     </div>
 
+    <!-- BARRA LATERAL (HISTORIAL) -->
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
@@ -72,6 +74,7 @@
         </div>
     </aside>
 
+    <!-- VENTANA PRINCIPAL DE CHAT -->
     <div class="flex-1 flex flex-col h-full overflow-hidden hidden" id="main-content-area">
         <header class="h-16 border-b border-[#30363d] bg-[#0d1117] flex items-center justify-between px-8">
             <div><span class="text-[#8b949e] text-xs font-medium uppercase bg-[#161b22] px-2.5 py-1 rounded-md border border-[#30363d]">Workspace Activo</span></div>
@@ -91,10 +94,19 @@
             <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2"></div>
             
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-4 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
-                <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] cursor-pointer smooth hover:border-amber-400 max-w-[180px]">
-                    <option value="gemini-3.5-flash" selected>🚀 Gemini 3.5 Flash</option>
-                    <option value="gemini-3.0-pro">🧠 Gemini 3 Pro</option>
+                
+                <!-- SELECTOR CONFIGURADO CON LOS NOMBRES EXCLUSIVOS -->
+                <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] cursor-pointer smooth hover:border-amber-400 max-w-[190px] focus:outline-none">
+                    <optgroup label="☀️ Google Gemini" class="bg-[#161b22]">
+                        <option value="gemini-2.5-flash" selected>🚀 Gemini 2.5 Flash</option>
+                        <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Quantum)</option>
+                    </optgroup>
+                    <optgroup label="🪶 Anthropic Claude" class="bg-[#161b22]">
+                        <option value="claude-3-5-sonnet-latest">🎭 Claude Sonnet 4.6 (Next-Gen)</option>
+                        <option value="claude-3-5-haiku-latest">⚡ Claude Haiku 4.2 (Hyper-Speed)</option>
+                    </optgroup>
                 </select>
+
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white">
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
                     <i data-lucide="send" class="w-4 h-4"></i>
@@ -103,6 +115,7 @@
         </main>
     </div>
 
+    <!-- MENÚ CONTEXTUAL (CLIC DERECHO) -->
     <div id="context-menu" class="hidden absolute bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl py-1 w-40 z-50 text-xs">
         <button id="ctx-rename" class="w-full text-left px-4 py-2 hover:bg-[#21262d] text-white flex items-center gap-2"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Renombrar</button>
         <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-red-950/50 text-red-400 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar</button>
@@ -131,6 +144,14 @@
         let rightClickedChatId = null;
         let listenInterval = null;
 
+        // Diccionario para transformar los IDs reales en nombres de interfaz avanzados
+        const nombresCoolModelos = {
+            'gemini-2.5-flash': 'GEMINI 2.5 FLASH',
+            'gemini-2.5-pro': 'GEMINI 2.5 PRO (QUANTUM)',
+            'claude-3-5-sonnet-latest': 'CLAUDE SONNET 4.6 (NEXT-GEN)',
+            'claude-3-5-haiku-latest': 'CLAUDE HAIKU 4.2 (HYPER-SPEED)'
+        };
+
         function playClick() { clickSound.currentTime = 0; clickSound.play(); }
 
         if (tokenActivo && userData) { entrarAlWorkspace(); }
@@ -143,7 +164,6 @@
             generateBtn.classList.add('hidden');
             tokenDisplayBox.classList.remove('hidden');
 
-            // BOTÓN COPIAR REPARADO AQUÍ (Asignación Directa y Segura)
             copyBtn.onclick = () => {
                 playClick();
                 navigator.clipboard.writeText(tokenActivo).then(() => {
@@ -203,15 +223,7 @@
                 btn.innerHTML = `<div class="flex items-center gap-2.5 truncate"><i data-lucide="message-square" class="w-3.5 h-3.5"></i><span class="truncate">${chat.name}</span></div>`;
                 
                 btn.onclick = () => { playClick(); activeChatId = chat.id; localStorage.setItem('sunai_active_chat', activeChatId); renderChats(); loadActiveChatMessages(); };
-                
-                btn.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    rightClickedChatId = chat.id;
-                    contextMenu.style.top = `${e.pageY}px`;
-                    contextMenu.style.left = `${e.pageX}px`;
-                    contextMenu.classList.remove('hidden');
-                };
-                
+                btn.oncontextmenu = (e) => { e.preventDefault(); rightClickedChatId = chat.id; contextMenu.style.top = `${e.pageY}px`; contextMenu.style.left = `${e.pageX}px`; contextMenu.classList.remove('hidden'); };
                 chatsContainer.appendChild(btn);
             });
             localStorage.setItem('sunai_chats', JSON.stringify(chatsList));
@@ -260,7 +272,8 @@
                 if(msg.role === 'user') {
                     chatHistory.insertAdjacentHTML('beforeend', `<div class="flex justify-end ml-auto"><div class="bg-[#21262d] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white max-w-xl">${msg.text}</div></div>`);
                 } else {
-                    chatHistory.insertAdjacentHTML('beforeend', `<div class="flex flex-col gap-1"><span class="text-[9px] text-amber-400 font-mono font-bold bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d] w-max">🤖 ${msg.model}</span><div class="bg-[#161b22] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white whitespace-pre-wrap max-w-xl">${msg.text}</div></div>`);
+                    const tagCool = nombresCoolModelos[msg.model] || msg.model;
+                    chatHistory.insertAdjacentHTML('beforeend', `<div class="flex flex-col gap-1"><span class="text-[9px] text-amber-400 font-mono font-bold bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d] w-max">🤖 ${tagCool}</span><div class="bg-[#161b22] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white whitespace-pre-wrap max-w-xl">${msg.text}</div></div>`);
                 }
             });
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -290,16 +303,13 @@
                 const data = await response.json();
                 document.getElementById(loadingId).remove();
                 
-                chat.messages.push({ role: 'model', model: mod.toUpperCase(), text: data.reply || "Sin respuesta." });
+                chat.messages.push({ role: 'model', model: mod, text: data.reply || "Sin respuesta." });
                 renderChats();
                 loadActiveChatMessages();
             } catch (err) { if(document.getElementById(loadingId)) document.getElementById(loadingId).remove(); }
         };
 
-        document.getElementById('logout-btn').onclick = () => {
-            localStorage.clear();
-            window.location.reload();
-        };
+        document.getElementById('logout-btn').onclick = () => { localStorage.clear(); window.location.reload(); };
         promptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendCommandBtn.click(); });
     </script>
 </body>
