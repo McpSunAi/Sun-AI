@@ -86,8 +86,17 @@
                     <p class="text-2xl font-medium text-[#8b949e]">¿Qué estructura quieres construir hoy en tu mapa?</p>
                 </div>
             </div>
-            <div class="w-full flex gap-3 items-center bg-[#161b22] px-5 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
+            
+            <div class="w-full flex gap-3 items-center bg-[#161b22] px-4 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
+                
+                <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] focus:outline-none cursor-pointer smooth hover:border-amber-400 max-w-[150px]">
+                    <option value="gemini-2.5-flash" selected>⚡ Gemini 2.5 Flash (Rápido)</option>
+                    <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Complejo/Scripts)</option>
+                    <option value="gemini-1.5-flash">⏳ Gemini 1.5 Flash (Estable)</option>
+                </select>
+
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white placeholder-[#8b949e]">
+                
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
@@ -109,6 +118,7 @@
         const newChatBtn = document.getElementById('new-chat-btn');
         const sendCommandBtn = document.getElementById('send-command-btn');
         const promptInput = document.getElementById('prompt-input');
+        const modelSelect = document.getElementById('model-select');
         const chatHistory = document.getElementById('chat-history');
         const welcomeMessage = document.getElementById('welcome-message-container');
         const robloxUsername = document.getElementById('roblox-username');
@@ -202,6 +212,7 @@
         sendCommandBtn.onclick = async () => {
             playClick();
             const prompt = promptInput.value.trim();
+            const modeloSeleccionado = modelSelect.value; // Captura el modelo del dropdown
             if(!prompt) return;
             if(welcomeMessage) welcomeMessage.remove();
 
@@ -210,10 +221,15 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
 
             try {
-                await fetch('https://sun-ai-1au5.onrender.com/api/enviar-comando', {
+                // Aquí se envía el prompt JUNTO con el modelo elegido a Render
+                await fetch('https://sun-ai-1au5.onrender.com/api/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': tokenActivo },
-                    body: JSON.stringify({ prompt: prompt, chatId: activeChatId })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        token: tokenActivo, 
+                        message: prompt, 
+                        model: modeloSeleccionado 
+                    })
                 });
             } catch (err) {}
         };
