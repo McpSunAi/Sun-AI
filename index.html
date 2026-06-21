@@ -8,8 +8,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0d1117; }
-        .smooth { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0d1117; user-select: none; }
+        .smooth { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
         .click-pop:active { transform: scale(0.97); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -20,12 +20,13 @@
 
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
 
+    <!-- PANTALLA DE INICIO (VINCULACIÓN) -->
     <div id="setup-screen" class="fixed inset-0 bg-[#0d1117] flex flex-col items-center justify-center z-50 p-6 smooth">
         <div class="w-full max-w-md bg-[#161b22] border border-[#30363d] rounded-2xl p-8 shadow-2xl text-center space-y-6">
             <div class="text-5xl animate-bounce">☀️</div>
             <div>
                 <h2 class="text-2xl font-bold text-white tracking-tight">Vincular Sun AI Global</h2>
-                <p class="text-sm text-[#8b949e] mt-2">Genera un token de acceso y pégalo dentro de tu plugin en Roblox Studio para desbloquear el Chatbot.</p>
+                <p class="text-sm text-[#8b949e] mt-2">Genera un token de acceso y pégalo dentro de tu plugin en Roblox Studio.</p>
             </div>
 
             <div class="space-y-4">
@@ -43,25 +44,30 @@
                     </div>
                     <div class="flex items-center justify-center gap-2 text-xs text-slate-400 py-2">
                         <div class="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Esperando enlace desde el plugin de Roblox...</span>
+                        <span>Esperando enlace desde Roblox Studio...</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- INTERFAZ PRINCIPAL -->
     <aside class="w-72 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full z-10 hidden" id="main-sidebar">
         <div class="p-4 space-y-3">
             <button id="new-chat-btn" class="click-pop smooth w-full flex items-center gap-3 px-4 py-3 bg-[#21262d] hover:bg-[#30363d] text-white rounded-full text-sm font-medium border border-[#30363d] cursor-pointer">
                 <i data-lucide="plus" class="w-4 h-4 text-amber-400"></i>
                 <span>Nuevo chat</span>
             </button>
-            <div class="flex items-center bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2">
-                <i data-lucide="search" class="w-3.5 h-3.5 text-[#8b949e] mr-2"></i>
-                <input id="search-chats" type="text" placeholder="Buscar chats..." class="bg-transparent text-xs w-full focus:outline-none text-white">
-            </div>
         </div>
+        <!-- Contenedor de Historial -->
         <div id="chats-container" class="flex-1 overflow-y-auto px-3 space-y-1"></div>
+        
+        <!-- Botón de Cerrar Sesión / Cambiar Cuenta -->
+        <div class="p-4 border-t border-[#30363d]">
+            <button id="logout-btn" class="w-full py-2 bg-red-950/40 hover:bg-red-900/60 border border-red-800/60 text-red-400 text-xs font-semibold rounded-lg smooth cursor-pointer flex items-center justify-center gap-2">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Cambiar de Cuenta / Salir
+            </button>
+        </div>
     </aside>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden hidden" id="main-content-area">
@@ -71,45 +77,34 @@
                 <div class="text-right">
                     <p id="roblox-username" class="text-xs font-bold text-white">Cargando...</p>
                     <div class="flex items-center justify-end gap-1">
-                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span class="text-[10px] text-emerald-400 font-medium">Studio Link</span>
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                        <span class="text-[10px] text-emerald-400 font-medium">Conectado</span>
                     </div>
                 </div>
-                <img id="roblox-avatar" src="https://images.rbxcdn.com/2bbb815fece386180ecaa976d8b08493.png" alt="Avatar" class="w-8 h-8 rounded-full border border-[#30363d] bg-[#0d1117]">
+                <img id="roblox-avatar" src="https://images.rbxcdn.com/2bbb815fece386180ecaa976d8b08493.png" alt="Avatar" class="w-8 h-8 rounded-full border border-[#30363d]">
             </div>
         </header>
 
         <main class="flex-1 flex flex-col justify-between p-8 max-w-4xl w-full mx-auto relative overflow-hidden">
-            <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2">
-                <div id="welcome-message-container" class="h-full flex flex-col justify-center py-12 space-y-2">
-                    <h2 class="text-4xl font-semibold bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-200 bg-clip-text text-transparent" id="dynamic-welcome-title">Hola, Desarrollador.</h2>
-                    <p class="text-2xl font-medium text-[#8b949e]">¿Qué estructura o script quieres inyectar hoy?</p>
-                </div>
-            </div>
+            <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2"></div>
             
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-4 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
-                
-                <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] focus:outline-none cursor-pointer smooth hover:border-amber-400 max-w-[180px]">
-                    <optgroup label="✨ Generación 3 (Nueva)" class="bg-[#161b22]">
-                        <option value="gemini-3.5-flash" selected>🚀 Gemini 3.5 Flash (Velocidad)</option>
-                        <option value="gemini-3.0-pro">🧠 Gemini 3 Pro (Razonamiento)</option>
-                    </optgroup>
-                    <optgroup label="⚡ Generación 2.5 (Estable)" class="bg-[#161b22]">
-                        <option value="gemini-2.5-flash">💥 Gemini 2.5 Flash</option>
-                        <option value="gemini-2.5-pro">👁️ Gemini 2.5 Pro (Avanzado)</option>
-                    </optgroup>
-                    <optgroup label="⏳ Legado (Anteriores)" class="bg-[#161b22]">
-                        <option value="gemini-1.5-flash">📦 Gemini 1.5 Flash</option>
-                    </optgroup>
+                <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] cursor-pointer smooth hover:border-amber-400 max-w-[180px]">
+                    <option value="gemini-3.5-flash" selected>🚀 Gemini 3.5 Flash</option>
+                    <option value="gemini-3.0-pro">🧠 Gemini 3 Pro</option>
                 </select>
-
-                <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white placeholder-[#8b949e]">
-                
+                <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white">
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </div>
         </main>
+    </div>
+
+    <!-- MENÚ CONTEXTUAL FLOTANTE (CLIC DERECHO) -->
+    <div id="context-menu" class="hidden absolute bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl py-1 w-40 z-50 text-xs">
+        <button id="ctx-rename" class="w-full text-left px-4 py-2 hover:bg-[#21262d] text-white flex items-center gap-2"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Renombrar</button>
+        <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-red-950/50 text-red-400 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar</button>
     </div>
 
     <script>
@@ -121,24 +116,25 @@
         const generateBtn = document.getElementById('generate-token-btn');
         const tokenDisplayBox = document.getElementById('token-display-box');
         const tokenLabel = document.getElementById('generated-token');
-        const copyBtn = document.getElementById('copy-token-btn');
         const chatsContainer = document.getElementById('chats-container');
-        const newChatBtn = document.getElementById('new-chat-btn');
-        const sendCommandBtn = document.getElementById('send-command-btn');
-        const promptInput = document.getElementById('prompt-input');
-        const modelSelect = document.getElementById('model-select');
         const chatHistory = document.getElementById('chat-history');
-        const welcomeMessage = document.getElementById('welcome-message-container');
-        const robloxUsername = document.getElementById('roblox-username');
-        const robloxAvatar = document.getElementById('roblox-avatar');
-        const dynamicWelcomeTitle = document.getElementById('dynamic-welcome-title');
-
-        let tokenActivo = "";
-        let activeChatId = 1;
-        let chatsList = [{ id: 1, name: "Chat inicial ☀️" }];
+        const promptInput = document.getElementById('prompt-input');
+        const sendCommandBtn = document.getElementById('send-command-btn');
+        const contextMenu = document.getElementById('context-menu');
+        
+        let tokenActivo = localStorage.getItem('sunai_token') || "";
+        let userData = JSON.parse(localStorage.getItem('sunai_user')) || null;
+        let chatsList = JSON.parse(localStorage.getItem('sunai_chats')) || [{ id: 1, name: "Chat inicial ☀️", messages: [] }];
+        let activeChatId = parseInt(localStorage.getItem('sunai_active_chat')) || 1;
+        let rightClickedChatId = null;
         let listenInterval = null;
 
         function playClick() { clickSound.currentTime = 0; clickSound.play(); }
+
+        // Verificar estado al cargar la página
+        if (tokenActivo && userData) {
+            entrarAlWorkspace();
+        }
 
         generateBtn.onclick = async () => {
             playClick();
@@ -154,52 +150,36 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: tokenActivo })
                 });
-            } catch(e) { console.error(e); }
-
+            } catch(e) {}
             listenInterval = setInterval(checkPluginHandshake, 2000);
-        };
-
-        copyBtn.onclick = () => {
-            playClick();
-            navigator.clipboard.writeText(tokenActivo);
-            copyBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>`;
-            lucide.createIcons();
-            setTimeout(() => { copyBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i>`; lucide.createIcons(); }, 1500);
         };
 
         async function checkPluginHandshake() {
             try {
-                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', {
-                    headers: { 'Authorization': tokenActivo }
-                });
+                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', { headers: { 'Authorization': tokenActivo } });
                 const userHeader = res.headers.get('Roblox-User');
                 const idHeader = res.headers.get('Roblox-Id');
 
-                if (userHeader && userHeader !== "") {
+                if (userHeader) {
                     clearInterval(listenInterval);
-                    robloxUsername.innerText = userHeader;
-                    dynamicWelcomeTitle.innerText = `Hola, ${userHeader}.`;
-                    if (idHeader && idHeader !== "1") {
-                        robloxAvatar.src = `https://www.roblox.com/headshot-thumbnail/image?userId=${idHeader}&width=150&height=150&format=png`;
-                    }
-                    setupScreen.classList.add('opacity-0', 'scale-95');
-                    setTimeout(() => {
-                        setupScreen.remove();
-                        mainSidebar.classList.remove('hidden');
-                        mainContentArea.classList.remove('hidden');
-                        renderChats();
-                        setInterval(refreshProfile, 5000);
-                    }, 300);
+                    userData = { name: userHeader, id: idHeader || "1" };
+                    localStorage.setItem('sunai_token', tokenActivo);
+                    localStorage.setItem('sunai_user', JSON.stringify(userData));
+                    entrarAlWorkspace();
                 }
             } catch (e) {}
         }
 
-        async function refreshProfile() {
-            try {
-                const res = await fetch('https://sun-ai-1au5.onrender.com/api/obtener-comando', { headers: { 'Authorization': tokenActivo } });
-                const userHeader = res.headers.get('Roblox-User');
-                if (userHeader) robloxUsername.innerText = userHeader;
-            } catch(e) {}
+        function entrarAlWorkspace() {
+            setupScreen.remove();
+            mainSidebar.classList.remove('hidden');
+            mainContentArea.classList.remove('hidden');
+            document.getElementById('roblox-username').innerText = userData.name;
+            if(userData.id !== "1") {
+                document.getElementById('roblox-avatar').src = `https://www.roblox.com/headshot-thumbnail/image?userId=${userData.id}&width=150&height=150&format=png`;
+            }
+            renderChats();
+            loadActiveChatMessages();
         }
 
         function renderChats() {
@@ -207,61 +187,108 @@
             chatsList.forEach(chat => {
                 const isActive = chat.id === activeChatId;
                 const btn = document.createElement('button');
-                btn.className = `click-pop smooth w-full text-left px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${isActive ? 'bg-[#30363d] text-white font-semibold' : 'text-[#8b949e] hover:bg-[#21262d]'}`;
-                btn.innerHTML = `<div class="flex items-center gap-2.5 overflow-hidden"><i data-lucide="message-square" class="w-3.5 h-3.5 opacity-70"></i><span class="truncate">${chat.name}</span></div>`;
-                btn.onclick = () => { playClick(); activeChatId = chat.id; renderChats(); };
+                btn.className = `click-pop smooth w-full text-left px-4 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between cursor-pointer ${isActive ? 'bg-[#30363d] text-white' : 'text-[#8b949e] hover:bg-[#21262d]'}`;
+                btn.innerHTML = `<div class="flex items-center gap-2.5 truncate"><i data-lucide="message-square" class="w-3.5 h-3.5"></i><span class="truncate">${chat.name}</span></div>`;
+                
+                btn.onclick = () => { playClick(); activeChatId = chat.id; localStorage.setItem('sunai_active_chat', activeChatId); renderChats(); loadActiveChatMessages(); };
+                
+                // Evento Clic Derecho (Menu Contextual)
+                btn.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    rightClickedChatId = chat.id;
+                    contextMenu.style.top = `${e.pageY} winners` ? `${e.pageY}px` : `${e.pageY}px`;
+                    contextMenu.style.left = `${e.pageX}px`;
+                    contextMenu.classList.remove('hidden');
+                };
+                
                 chatsContainer.appendChild(btn);
             });
+            localStorage.setItem('sunai_chats', JSON.stringify(chatsList));
             lucide.createIcons();
         }
 
-        newChatBtn.onclick = () => { playClick(); const newId = chatsList.length + 1; chatsList.push({ id: newId, name: `Conversación #${newId}` }); activeChatId = newId; renderChats(); };
+        // Acciones del Clic Derecho
+        document.getElementById('ctx-rename').onclick = () => {
+            contextMenu.classList.add('hidden');
+            const nuevoNombre = prompt("Introduce el nuevo nombre del chat:");
+            if(nuevoNombre && nuevoNombre.trim() !== "") {
+                const chat = chatsList.find(c => c.id === rightClickedChatId);
+                if(chat) { chat.name = nuevoNombre.trim(); renderChats(); }
+            }
+        };
+
+        document.getElementById('ctx-delete').onclick = () => {
+            contextMenu.classList.add('hidden');
+            if(chatsList.length <= 1) return alert("No puedes borrar todos tus chats.");
+            chatsList = chatsList.filter(c => c.id !== rightClickedChatId);
+            if(activeChatId === rightClickedChatId) activeChatId = chatsList[0].id;
+            localStorage.setItem('sunai_active_chat', activeChatId);
+            renderChats();
+            loadActiveChatMessages();
+        };
+
+        window.onclick = () => contextMenu.classList.add('hidden');
+
+        document.getElementById('new-chat-btn').onclick = () => {
+            playClick();
+            const newId = Date.now();
+            chatsList.push({ id: newId, name: `Conversación ${chatsList.length + 1}`, messages: [] });
+            activeChatId = newId;
+            localStorage.setItem('sunai_active_chat', activeChatId);
+            renderChats();
+            loadActiveChatMessages();
+        };
+
+        function loadActiveChatMessages() {
+            chatHistory.innerHTML = '';
+            const chat = chatsList.find(c => c.id === activeChatId);
+            if(!chat || chat.messages.length === 0) {
+                chatHistory.innerHTML = `<div class="h-full flex flex-col justify-center py-12 text-center"><h2 class="text-3xl font-bold text-white">Hola, ${userData.name}.</h2><p class="text-sm text-[#8b949e] mt-1">¿Qué estructura quieres inyectar hoy?</p></div>`;
+                return;
+            }
+            chat.messages.forEach(msg => {
+                if(msg.role === 'user') {
+                    chatHistory.insertAdjacentHTML('beforeend', `<div class="flex justify-end ml-auto"><div class="bg-[#21262d] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white max-w-xl">${msg.text}</div></div>`);
+                } else {
+                    chatHistory.insertAdjacentHTML('beforeend', `<div class="flex flex-col gap-1"><span class="text-[9px] text-amber-400 font-mono font-bold bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d] w-max">🤖 ${msg.model}</span><div class="bg-[#161b22] border border-[#30363d] px-4 py-2.5 rounded-2xl text-sm text-white whitespace-pre-wrap max-w-xl">${msg.text}</div></div>`);
+                }
+            });
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
 
         sendCommandBtn.onclick = async () => {
-            playClick();
             const prompt = promptInput.value.trim();
-            const modeloSeleccionado = modelSelect.value;
-            const modeloNombre = modelSelect.options[modelSelect.selectedIndex].text.split(" ")[1]; // Extrae el nombre visual
-            
+            const mod = document.getElementById('model-select').value;
             if(!prompt) return;
-            if(welcomeMessage) welcomeMessage.remove();
 
-            // Mensaje del Usuario
-            chatHistory.insertAdjacentHTML('beforeend', `<div class="flex items-start gap-4 max-w-3xl justify-end ml-auto"><div class="bg-[#21262d] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-white">${prompt}</div></div>`);
-            
-            // Espacio de carga para la IA
-            const loadingId = "load-" + Date.now();
-            chatHistory.insertAdjacentHTML('beforeend', `<div id="${loadingId}" class="flex items-start gap-4 max-w-3xl"><div class="bg-[#161b22] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-slate-400 flex items-center gap-2"><span>Generando respuesta con ${modeloNombre}...</span></div></div>`);
-            
+            const chat = chatsList.find(c => c.id === activeChatId);
+            chat.messages.push({ role: 'user', text: prompt });
+            renderChats();
+            loadActiveChatMessages();
             promptInput.value = '';
+
+            const loadingId = "loading-box";
+            chatHistory.insertAdjacentHTML('beforeend', `<div id="${loadingId}" class="text-xs text-slate-500 italic animate-pulse">Pensando...</div>`);
             chatHistory.scrollTop = chatHistory.scrollHeight;
 
             try {
                 const response = await fetch('https://sun-ai-1au5.onrender.com/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        token: tokenActivo, 
-                        message: prompt, 
-                        model: modeloSeleccionado 
-                    })
+                    body: JSON.stringify({ token: tokenActivo, message: prompt, model: mod })
                 });
-                
                 const data = await response.json();
-                document.getElementById(loadingId).remove(); // Quitar cargador
-                
-                // Imprimir respuesta final con la firma del modelo que respondió
-                chatHistory.insertAdjacentHTML('beforeend', `
-                    <div class="flex flex-col items-start gap-1 max-w-3xl">
-                        <span class="text-[10px] text-amber-400 font-mono font-bold bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d]">🤖 ${modeloSeleccionado.toUpperCase()}</span>
-                        <div class="bg-[#161b22] border border-[#30363d] px-5 py-3 rounded-2xl text-sm text-white whitespace-pre-wrap">${data.reply || "Sin respuesta"}</div>
-                    </div>
-                `);
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-
-            } catch (err) {
                 document.getElementById(loadingId).remove();
-            }
+                
+                chat.messages.push({ role: 'model', model: mod.toUpperCase(), text: data.reply || "Sin respuesta." });
+                renderChats();
+                loadActiveChatMessages();
+            } catch (err) { document.getElementById(loadingId).remove(); }
+        };
+
+        document.getElementById('logout-btn').onclick = () => {
+            localStorage.clear();
+            window.location.reload();
         };
         promptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendCommandBtn.click(); });
     </script>
