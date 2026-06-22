@@ -91,10 +91,15 @@
             <div id="chat-history" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-2"></div>
             
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-4 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
-                <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] cursor-pointer smooth hover:border-amber-400 max-w-[180px]">
-                    <option value="gemini-3.5-flash" selected>🚀 Gemini 3.5 Flash</option>
-                    <option value="gemini-3.0-pro">🧠 Gemini 3 Pro</option>
-                </select>
+                <select id="model-select">
+    <option value="gemini-2.5-flash" selected>
+        🚀 Gemini 3.5 Flash
+    </option>
+
+    <option value="gemini-2.5-pro">
+        🧠 Gemini 3.1 Pro
+    </option>
+</select>
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white">
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
                     <i data-lucide="send" class="w-4 h-4"></i>
