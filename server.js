@@ -1,28 +1,81 @@
 const express = require('express');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-require('dotenv').config();
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let tokensActivos = {};
 
+app.post('/api/registrar-token', (req, res) => {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: "Falta el token" });
+    tokensActivos[token] = { action: "ninguna", name: "", size: [1, 1, 1], color: "Bright blue", robloxUser: null, robloxId: null };
+    console.log(`[SEGURIDAD] Token registrado: ${token}`);
+    res.json({ status: "registrado", token: token });
+});
+
+app.post('/api/verificar-token', (req, res) => {
+    const { token, user, id } = req.body;
+    if (!tokensActivos[token]) return res.status(401).json({ error: "Token inválido" });
+    tokensActivos[token].robloxUser = user;
+    tokensActivos[token].robloxId = id;
+    console.log(`[SEGURIDAD] Plugin enlazado: ${token} por ${user}`);
+    res.json({ status: "enlazado_ok" });
+});
+
+// 3. LLAMADA MEJORADA A GEMINI CON SELECCIÓN DE MODELO REAL
 app.post('/api/chat', async (req, res) => {
-    const { message, model } = req.body;
-
+    const { token, message, model } = req.body;
+    
+    if (!token || !tokensActivos[token]) {
+        return res.status(401).json({ error: "No autorizado" });
+    }
+    
+    const modeloFinal = model || 'gemini-2.5-flash';
+    console.log(`[IA] Ejecutando prompt en: ${modeloFinal}`);
+    
     try {
-        // Usamos el modelo que venga del selector (gemini-2.5-flash o gemini-2.5-pro)
-        const geminiModel = ai.getGenerativeModel({ model: model });
-        const result = await geminiModel.generateContent(message);
-        const response = await result.response;
+        const response = await ai.models.generateContent({
+            model: modeloFinal,
+            contents: message,
+            // Instrucción oculta para guiar la personalidad del modelo seleccionado
+            config: {
+                systemInstruction: "Eres Sun AI, un asistente experto para Roblox Studio. Responde de forma concisa y amigable."
+            }
+        });
         
-        res.json({ reply: response.text() });
+        const respuestaTexto = response.text;
+        
+        // Detección automática para pasar las acciones al plugin de Roblox
+        if (message.toLowerCase().includes("bloque") || message.toLowerCase().includes("part")) {
+            tokensActivos[token].action = "crear_bloque";
+            tokensActivos[token].name = "Bloque_Generado_IA";
+            tokensActivos[token].size = [5, 5, 5];
+            tokensActivos[token].color = "Bright red";
+        }
+        
+        res.json({ reply: respuestaTexto });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error en Gemini: " + error.message });
+        console.error("Error con Gemini:", error);
+        res.status(500).json({ error: "Error en el motor de la IA" });
     }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log('Sun AI Gemini está activo'));
+app.get('/api/obtener-comando', (req, res) => {
+    const token = req.headers['authorization'];
+    if (!token || !tokensActivos[token]) return res.status(401).json({ error: "No autorizado" });
+    
+    const info = tokensActivos[token];
+    res.setHeader('Roblox-User', info.robloxUser || "");
+    res.setHeader('Roblox-Id', info.robloxId || "");
+    res.setHeader('Access-Control-Expose-Headers', 'Roblox-User, Roblox-Id');
+    
+    res.json({ action: info.action, name: info.name, size: info.size, color: info.color });
+    info.action = "ninguna";
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => { console.log(`Servidor multimodelo en puerto ${PORT}`); });
