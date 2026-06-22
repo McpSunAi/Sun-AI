@@ -90,15 +90,15 @@
             
             <div class="w-full flex gap-3 items-center bg-[#161b22] px-4 py-3 rounded-full border border-[#30363d] focus-within:border-[#444c56] smooth shadow-xl mb-2">
                 <select id="model-select" class="bg-[#21262d] text-xs text-white px-3 py-1.5 rounded-full border border-[#30363d] cursor-pointer smooth hover:border-amber-400 max-w-[190px] focus:outline-none">
-                    <optgroup label="☀️ Google Gemini" class="bg-[#161b22]">
-                        <option value="gemini-2.5-flash" selected>🚀 Gemini 2.5 Flash</option>
-                        <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Quantum)</option>
-                    </optgroup>
-                    <optgroup label="🪶 Anthropic Claude" class="bg-[#161b22]">
-                        <option value="claude-3-5-sonnet-latest">🎭 Claude Sonnet 4.6 (Next-Gen)</option>
-                        <option value="claude-3-5-haiku-latest">⚡ Claude Haiku 4.2 (Hyper-Speed)</option>
-                    </optgroup>
-                </select>
+    <optgroup label="☀️ Google Gemini" class="bg-[#161b22]">
+        <option value="gemini-2.5-flash">🚀 Gemini 2.5 Flash</option>
+        <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Quantum)</option>
+    </optgroup>
+    <optgroup label="⚡ Groq (Llama 3)" class="bg-[#161b22]">
+        <option value="llama-3.3-70b-versatile">🦙 Llama 3.3 70B (Pro)</option>
+        <option value="llama-3.1-8b-instant">💨 Llama 3.1 8B (Instant)</option>
+    </optgroup>
+</select>
 
                 <input id="prompt-input" type="text" placeholder="Escribe tu orden aquí..." class="flex-1 bg-transparent py-1 text-sm focus:outline-none text-white">
                 <button id="send-command-btn" class="click-pop smooth p-2.5 bg-amber-400 hover:bg-amber-500 text-[#0d1117] rounded-full cursor-pointer">
