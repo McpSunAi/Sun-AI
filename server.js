@@ -8,20 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuración de Gemini
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/api/chat', async (req, res) => {
-    const { model, message } = req.body;
-    const messages = [{ role: "user", content: message }];
-
+    const { message, model } = req.body;
     try {
-        if (model === 'gemini') {
-            const geminiModel = ai.getGenerativeModel({ model: "gemini-pro" });
-            const result = await geminiModel.generateContent(message);
-            res.json({ response: result.response.text() });
-        } 
-        else if (model === 'groq') {
+        if (model.includes('llama')) {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -29,18 +21,21 @@ app.post('/api/chat', async (req, res) => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
-                    messages: messages
+                    model: model,
+                    messages: [{ role: "user", content: message }]
                 })
             });
             const data = await response.json();
-            res.json({ response: data.choices[0].message.content });
+            return res.json({ reply: data.choices[0].message.content });
+        } else {
+            const geminiModel = ai.getGenerativeModel({ model: "gemini-pro" });
+            const result = await geminiModel.generateContent(message);
+            return res.json({ reply: result.response.text() });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Error con la IA" });
+        res.status(500).json({ error: "Error en el servidor" });
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Sun AI listo'));
+app.listen(process.env.PORT || 3000, () => console.log('Sun AI listo'));
