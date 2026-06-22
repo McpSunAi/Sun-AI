@@ -8,15 +8,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuración de las dos IAs
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Configuración de Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/api/chat', async (req, res) => {
     const { message, model } = req.body;
 
-    try {
-        // SI ES LLAMA (GROQ)
-        if (model.includes('llama')) {
+    // 1. SI ES MODELO DE GROQ
+    if (model.includes('llama')) {
+        try {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -24,23 +24,33 @@ app.post('/api/chat', async (req, res) => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    model: model,
+                    model: model, 
                     messages: [{ role: "user", content: message }]
                 })
             });
             const data = await response.json();
-            return res.json({ reply: data.choices[0].message.content });
-        } 
-        // SI ES GEMINI
-        else {
-            const geminiModel = ai.getGenerativeModel({ model: "gemini-pro" });
-            const result = await geminiModel.generateContent(message);
-            return res.json({ reply: result.response.text() });
+            
+            if (data.choices && data.choices[0]) {
+                return res.json({ reply: data.choices[0].message.content });
+            } else {
+                return res.json({ error: "Groq no respondió correctamente: " + JSON.stringify(data) });
+            }
+        } catch (error) {
+            return res.json({ error: "Error de conexión con Groq" });
         }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error en el servidor al conectar con la IA" });
+    } 
+    
+    // 2. SI ES MODELO DE GEMINI
+    else {
+        try {
+            const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result = await geminiModel.generateContent(message);
+            const response = await result.response;
+            return res.json({ reply: response.text() });
+        } catch (error) {
+            return res.json({ error: "Error con Gemini: " + error.message });
+        }
     }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log('Sun AI Backend en línea'));
+app.listen(process.env.PORT || 3000, () => console.log('Sun AI listo y configurado'));
